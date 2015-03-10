@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <string.h>
+#include <assert.h>
 #define DEBUG_MODE
 
 using namespace std;
@@ -211,7 +212,13 @@ void setColor(int ix, int iy, const vec4& color)
 // TODO: add your ray-sphere intersection routine here.
 float get_t(const sphere &S, const Ray &ray);
 
-bool sphere_intersection(const Ray &ray, sphere S, vec4 &hitPoint);
+vec4 get_hitpoint(const sphere &S, const Ray& ray, float t);
+#define get_hitpoint(matrix, ray, t)  ((matrix) * (ray).origin + (t) * (matrix) * (ray).dir)
+#define get_normal(sphere, hitpoint) ((hitpoint) - (sphere).center)
+
+float get_spec_effects(const vector<light> &lights, const sphere& sphere, const vec4& hit_point, const Ray &ray, const vec4& normal);
+float get_diffuse_effects(const vector<light> &lights, const sphere& sphere, const vec4& hit_point, const vec4& normal);
+vec4 get_intensity(const vector<light>& lights, float spec_effects, float diffuse_effects, const vec4& g_ambient, const sphere& S);
 
 // -------------------------------------------------------------------
 // Ray tracing
@@ -236,21 +243,92 @@ vec4 trace(const Ray& ray)
 
 	// if no t values for a point, return background color
 	if(t == 0.0)		return background;
+	
+	vec4 hit_point = get_hitpoint(1, ray, t);
+	vec4 unit_hit_point = get_hitpoint(g_sphere->inverse_matrix, ray, t);
+	vec4 normal_vec = normalize(get_normal(*g_sphere, unit_hit_point));
+	vec4 normal_altered_vec = normalize(transpose(g_sphere->inverse_matrix) * normal_vec); 
+	normal_altered_vec.w = 0;
+	assert(normal_vec.w == 0);
+	assert(normal_vec.w == 0);
+	// TODO should normal_altered_vec.w != 0 after transpose?
+#ifdef DEBUG_MODE_ALL
+	if(t > 0.0) {
+		cout << "-----trace-----" << endl;
+		cout << "" << g_sphere->name << "\t normal_vec=" << " " << normal_vec << endl;
+		cout << "	    \tnormal__altered_vec=" << normal_altered_vec << endl;
+		cout << "       \thit_point=" << hit_point << endl;
+		cout << "       \tunit_hit_point=" << unit_hit_point << endl;
+		cout << "-----end trace-----" << endl;
+	}
+#endif
+	
+	// calculate specular effects
+	float spec_effects = get_spec_effects(g_lights, *g_sphere, hit_point, ray, normal_altered_vec);
+	// calculate diffuse effects
+	float diffuse_effects = get_diffuse_effects(g_lights, *g_sphere, hit_point, normal_altered_vec);
+	// multiply by the specular and diffuse components
+	vec4 color = get_intensity(g_lights, spec_effects, diffuse_effects, g_ambient, *g_sphere);
+	
 
 	// part a
-	float r = g_sphere->color_s.x * g_ambient.x;
-	float g = g_sphere->color_s.y * g_ambient.y;
-	float b = g_sphere->color_s.z * g_ambient.z;
 
 #ifdef DEBUG_MODE
-	if(t > 0.0) 
-		cout << g_sphere->name << " t=" << t << endl;
-
+	// if(t > 0.0) 
+	//	cout << "trace: " << g_sphere->name << " t=" << t << endl;
+	cout << "trace:" << "Sphere: " << g_sphere->name << " color:" << color << endl;
 #endif
 
-    return vec4(r, g, b, 0.0f);
+    return color;
 }
 
+vec4 get_intensity(const vector<light>& lights, float spec_effects, float diffuse_effects, const vec4& g_ambient, const sphere& S) {
+	float r = g_ambient.x * S.ka *  S.color_s.x;
+	float g = g_ambient.y * S.ka *  S.color_s.y;
+	float b = g_ambient.z * S.ka *  S.color_s.z;
+	
+	// for every light source
+	for(int i = 0; i < (int)lights.size(); i++) {
+		// calculate L
+		r += lights[i].i_light.x * spec_effects + lights[i].i_light.x * diffuse_effects * S.color_s.x;
+		g += lights[i].i_light.y * spec_effects + lights[i].i_light.y * diffuse_effects * S.color_s.y;
+		b += lights[i].i_light.z * spec_effects + lights[i].i_light.z * diffuse_effects * S.color_s.z;
+	}
+	return vec4(r,g,b, 0);
+}
+
+// ks * (R * V)^n
+float get_spec_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {
+	return 0.0;
+}
+// kd * (n*L)
+float get_diffuse_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const vec4& normal) {
+	
+	float diffuse_effects = 0.0;
+	for(int i = 0; i < (int)lights.size(); i++) {
+		// calculate L
+		vec4 L = normalize(lights[i].position - hit_point);
+		assert(L.w == 0);
+		assert(normal.w == 0);
+		float ndotl = dot(normal,L);
+#ifdef DEBUG_MODE
+		//if(S.name == "s1" && lights[i].name == "l1")
+			cout << "get_diffuse_effect():" <<S.name << " " << lights[i].name << " hit_point=" <<  hit_point << endl;
+			cout << "get_diffuse_effect():" <<S.name << " " << lights[i].name << " normal=" <<  normal << endl;
+			cout << "get_diffuse_effect():" <<S.name << " " << lights[i].name << " light position=" <<  lights[i].position << endl;
+			cout << "get_diffuse_effect():" <<S.name << " " << lights[i].name << " light vector=" <<  L << endl;
+			cout << "get_diffuse_effect():" <<S.name << " " << lights[i].name << " n dot l=" <<  ndotl << endl;
+#endif
+		float t_diffuse_effects = S.kd * ndotl;
+		// special case: if N*L < 0, set to 0, else if diffuse_effects > 1, set to 1
+		diffuse_effects += (ndotl < 0)?0:((t_diffuse_effects > 1)?1:t_diffuse_effects);
+	}
+#ifdef DEBUG_MODE
+	cout << "get_diffuse_effects() " << endl;
+	cout << "difuse effects = " << diffuse_effects  << endl;
+#endif
+	return diffuse_effects;
+}
 float get_t(const sphere &S, const Ray &ray) {
 	// calculate S' and C'
 	vec4 iS = S.inverse_matrix * ray.origin;
@@ -306,6 +384,11 @@ void renderPixel(int ix, int iy)
     ray.origin = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     ray.dir = getDir(ix, iy);
     vec4 color = trace(ray);
+#ifdef DEBUG_MODE
+	if(color.x != background.x && color.y != background.y && color.z != background.z)
+		cout << "color will be renderred=" << color << endl;
+#endif 
+
     setColor(ix, iy, color);
 }
 
