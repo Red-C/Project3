@@ -11,9 +11,14 @@
 #include <vector>
 #include <string.h>
 #include <assert.h>
-#define DEBUG_MODE
-
+#ifdef DEBUG_MODE
+#define TRACE_DEBUG
+#define SPECU_DEBUG
+#define DIFFU_DEBUG
+#define AMBIE_DEBUG
+#endif
 using namespace std;
+
 
 int g_width;
 int g_height;
@@ -212,13 +217,12 @@ void setColor(int ix, int iy, const vec4& color)
 // TODO: add your ray-sphere intersection routine here.
 float get_t(const sphere &S, const Ray &ray);
 
-vec4 get_hitpoint(const sphere &S, const Ray& ray, float t);
 #define get_hitpoint(matrix, ray, t)  ((matrix) * (ray).origin + (t) * (matrix) * (ray).dir)
 #define get_normal(center, hitpoint) ((hitpoint) - center)
 
 vec4 get_spec_effects(const vector<light> &lights, const sphere& sphere, const vec4& hit_point, const Ray &ray, const vec4& normal);
 vec4 get_diffuse_effects(const vector<light> &lights, const sphere& sphere, const vec4& hit_point, const vec4& normal);
-vec4 get_intensity(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S);
+vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S);
 
 // -------------------------------------------------------------------
 // Ray tracing
@@ -233,7 +237,7 @@ vec4 trace(const Ray& ray)
 		float ti = get_t(g_spheres[i], ray);
 		
 		// if t is invalid value, current sphere doesn't intersect with ray
-		if(ti < 1.0) 		continue;
+		if(ti <= 1.0) 		continue;
 		// if t hasn't assigned a value or current t is smaller than t
 		else if(t == 0.0 || ti < t) {
 			t = ti;
@@ -248,12 +252,20 @@ vec4 trace(const Ray& ray)
 	vec4 unit_hit_point = get_hitpoint(g_sphere->inverse_matrix, ray, t);
 	vec4 normal_vec = normalize(get_normal(vec4(0,0,0,1), unit_hit_point));
 	assert(normal_vec.w == 0);
+#ifdef TRACE_DEBUG 
+	//assert(normal_vec.w == 0);
+	if ( normal_vec.w != 0) {
+		cout << "hit_point=" << hit_point << endl;
+		cout << "unit_hit_point=" << unit_hit_point << endl;
+	}
+	cout << "normal_vec=" << normal_vec<< endl;
+#endif
 	mat4 iM = g_sphere->inverse_matrix;
 	vec4 normal_altered_vec = transpose(iM) * normal_vec; 
 	normal_altered_vec.w = 0;
 	normal_altered_vec = normalize(normal_altered_vec);
 	// TODO should normal_altered_vec.w != 0 after transpose?
-#ifdef DEBUG_MODE
+#ifdef TRACE_DEBUG 
 	if(t > 0.0) {
 		cout << g_sphere->name << "-----trace-----" << endl;
 		cout << g_sphere->name << "" << g_sphere->name << "\t normal_vec=" << " " << normal_vec << endl;
@@ -269,12 +281,10 @@ vec4 trace(const Ray& ray)
 	// calculate diffuse effects
 	vec4 diffuse_effects = get_diffuse_effects(g_lights, *g_sphere, hit_point, normal_altered_vec);
 	// multiply by the specular and diffuse components
-	vec4 color = get_intensity(spec_effects, diffuse_effects, g_ambient, *g_sphere);
+	vec4 color = get_color(spec_effects, diffuse_effects, g_ambient, *g_sphere);
 	
 
-	// part a
-
-#ifdef DEBUG_MODE
+#ifdef TRACE_DEBUG 
 	// if(t > 0.0) 
 	//	cout << "trace: " << g_sphere->name << " t=" << t << endl;
 	cout << "trace:" << "Sphere: " << g_sphere->name << " color:" << color << endl;
@@ -283,19 +293,41 @@ vec4 trace(const Ray& ray)
     return color;
 }
 
-vec4 get_intensity(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S){
-	vec4 intensity;
-	intensity = S.ka * g_ambient + spec_effects + diffuse_effects * S.color_s;
-//	return S.color_s * g_ambient + S.color_s * intensity;
-	return intensity;
+vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S){
+
+	vec4 color = S.ka * g_ambient * S.color_s + spec_effects + diffuse_effects * S.color_s;
+
+	return color;
 }
 
 // ks * (R * V)^n
 vec4 get_spec_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {
+	
 	vec4 specular(0,0,0,0);
 	for(int i = 0; i < (int) lights.size(); i++) {
+		vec4 L = lights[i].position - hit_point;
+		assert(L.w == 0);
+		assert(normal.w == 0);
+		L = normalize(L);
+		vec4 R = 2 * normal * dot(normal,L) - L;
+		assert(R.w == 0);
+		R = normalize(R);
+		vec4 V = ray.origin - hit_point;	
+		assert(V.w == 0);
+		V = normalize(V);
+#ifdef SPECU_DEBUG 
+		cout << S.name << " specular dot(R,V)=" << dot(R,V) << endl;
+		cout << S.name << " specular R=" << R << endl;
+		cout << S.name << " specular V=" << V << endl;
+		cout << S.name << " specular hitpoint=" << hit_point << endl;
+		cout << S.name << " specular lightP= " << lights[i].position << endl;
+#endif
+		specular += lights[i].i_light * S.ks * pow(dot(R,V),S.n);
 	}
-	return 0.0;
+#ifdef SPECU_DEBUG 
+	cout <<S.name << " specular=" << specular << endl;
+#endif
+	return specular;
 }
 // kd * (n*L)
 vec4 get_diffuse_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const vec4& normal) {
@@ -311,7 +343,7 @@ vec4 get_diffuse_effects(const vector<light> &lights, const sphere& S, const vec
 
 		if(dot(normal,L) > 0)
 			diffuse += S.kd * dot(normal,L) * lights[i].i_light;
-#ifdef DEBUG_MODE
+#ifdef DIFFU 
 		cout << S.name << " diffuse accumulative dot=" << dot(normal,L) << endl;
 		cout << S.name << " diffuse accumulative lights intensity=" << lights[i].i_light << endl;
 		cout << S.name << " diffuse accumulative S.kd * dot(normal,L) * lights[i].i_light="<< dot(normal,L) * lights[i].i_light << endl;
@@ -335,12 +367,10 @@ float get_t(const sphere &S, const Ray &ray) {
 	float C = (length(iS) * length(iS)) - 1.0;
 
 	float n = B*B-A*C;
-#ifdef DEBUG_MODE
-#ifdef DEBUG_MODE_get_t
+#ifdef DIFFU 
 	if(n > 0.0) 
 		cout << S.name << ": n=" << n << endl;
 
-#endif
 #endif
 	if(n < 0.0)
         return 0.0;
@@ -351,10 +381,6 @@ float get_t(const sphere &S, const Ray &ray) {
 	// return lowest t     >1?
 	return (th < th2)? th: th2;
 	
-}
-
-bool sphere_intersection(const Ray &ray, sphere S, vec4 &hitPoint) {
-	return false;
 }
 
 vec4 getDir(int ix, int iy)
