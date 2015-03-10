@@ -248,11 +248,9 @@ vec4 trace(const Ray& ray)
 	vec4 unit_hit_point = get_hitpoint(g_sphere->inverse_matrix, ray, t);
 	vec4 normal_vec = normalize(get_normal(*g_sphere, unit_hit_point));
 	mat4 iM = g_sphere->inverse_matrix;
-	iM[0].w = 0;
-	iM[1].w = 0;
-	iM[2].w = 0;
-	vec4 normal_altered_vec = normalize(transpose(iM) * normal_vec); 
+	vec4 normal_altered_vec = transpose(iM) * normal_vec; 
 	normal_altered_vec.w = 0;
+	normal_altered_vec = normalize(normal_altered_vec);
 	assert(normal_vec.w == 0);
 	assert(normal_vec.w == 0);
 	// TODO should normal_altered_vec.w != 0 after transpose?
