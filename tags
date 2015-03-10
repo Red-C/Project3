@@ -1,0 +1,222 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DegreesToRadians	vecm.h	/^const float  DegreesToRadians = float(M_PI \/ 180.0);$/;"	v
+DivideByZeroTolerance	vecm.h	/^const float  DivideByZeroTolerance = float(1.0e-07);$/;"	v
+Error	matm.h	716;"	d
+Frustum	matm.h	/^mat4 Frustum( const float left, const float right,$/;"	f
+InvertMatrix	matm.h	/^bool InvertMatrix(const mat4& m4, mat4& m4InvOut)$/;"	f
+LookAt	matm.h	/^mat4 LookAt( const vec4& eye, const vec4& at, const vec4& up )$/;"	f
+M_PI	vecm.h	15;"	d
+Ortho	matm.h	/^mat4 Ortho( const float left, const float right,$/;"	f
+Ortho2D	matm.h	/^mat4 Ortho2D( const float left, const float right,$/;"	f
+Perspective	matm.h	/^mat4 Perspective( const float fovy, const float aspect,$/;"	f
+Ray	template-rt.cpp	/^struct Ray$/;"	s	file:
+RotateX	matm.h	/^mat4 RotateX( const float theta )$/;"	f
+RotateY	matm.h	/^mat4 RotateY( const float theta )$/;"	f
+RotateZ	matm.h	/^mat4 RotateZ( const float theta )$/;"	f
+Scale	matm.h	/^mat4 Scale( const float x, const float y, const float z )$/;"	f
+Scale	matm.h	/^mat4 Scale( const vec3& v )$/;"	f
+Translate	matm.h	/^mat4 Translate( const float x, const float y, const float z )$/;"	f
+Translate	matm.h	/^mat4 Translate( const vec3& v )$/;"	f
+Translate	matm.h	/^mat4 Translate( const vec4& v )$/;"	f
+_CRT_SECURE_NO_WARNINGS	template-rt.cpp	5;"	d	file:
+__ANGEL_MAT_H__	matm.h	8;"	d
+__ANGEL_VEC_H__	vecm.h	8;"	d
+_m	matm.h	/^    vec2  _m[2];$/;"	m	class:mat2
+_m	matm.h	/^    vec3  _m[3];$/;"	m	class:mat3
+_m	matm.h	/^    vec4  _m[4]; \/\/ row vectors -- _m[row][col]$/;"	m	class:mat4
+cross	vecm.h	/^vec3 cross(const vec3& a, const vec3& b )$/;"	f
+cross	vecm.h	/^vec3 cross(const vec4& a, const vec4& b )$/;"	f
+dir	template-rt.cpp	/^    vec4 dir;$/;"	m	struct:Ray	file:
+dot	vecm.h	/^float dot( const vec2& u, const vec2& v ) {$/;"	f
+dot	vecm.h	/^float dot( const vec3& u, const vec3& v ) {$/;"	f
+dot	vecm.h	/^float dot( const vec4& u, const vec4& v ) {$/;"	f
+g_bottom	template-rt.cpp	/^float g_bottom;$/;"	v
+g_colors	template-rt.cpp	/^vector<vec4> g_colors;$/;"	v
+g_height	template-rt.cpp	/^int g_height;$/;"	v
+g_left	template-rt.cpp	/^float g_left;$/;"	v
+g_near	template-rt.cpp	/^float g_near;$/;"	v
+g_right	template-rt.cpp	/^float g_right;$/;"	v
+g_top	template-rt.cpp	/^float g_top;$/;"	v
+g_width	template-rt.cpp	/^int g_width;$/;"	v
+getDir	template-rt.cpp	/^vec4 getDir(int ix, int iy)$/;"	f
+identity	matm.h	/^mat4 identity()$/;"	f
+length	vecm.h	/^float length( const vec2& v ) {$/;"	f
+length	vecm.h	/^float length( const vec3& v ) {$/;"	f
+length	vecm.h	/^float length( const vec4& v ) {$/;"	f
+loadFile	template-rt.cpp	/^void loadFile(const char* filename)$/;"	f
+main	template-rt.cpp	/^int main(int argc, char* argv[])$/;"	f
+mat2	matm.h	/^    mat2( const float d = float(1.0) )  \/\/ Create a diagional matrix$/;"	f	class:mat2
+mat2	matm.h	/^    mat2( const mat2& m ) {$/;"	f	class:mat2
+mat2	matm.h	/^    mat2( const vec2& a, const vec2& b )$/;"	f	class:mat2
+mat2	matm.h	/^    mat2( float m00, float m10, float m01, float m11 )$/;"	f	class:mat2
+mat2	matm.h	/^class mat2 {$/;"	c
+mat3	matm.h	/^    mat3( const float d = float(1.0) )  \/\/ Create a diagional matrix$/;"	f	class:mat3
+mat3	matm.h	/^    mat3( const mat3& m )$/;"	f	class:mat3
+mat3	matm.h	/^    mat3( const vec3& a, const vec3& b, const vec3& c )$/;"	f	class:mat3
+mat3	matm.h	/^    mat3( float m00, float m10, float m20,$/;"	f	class:mat3
+mat3	matm.h	/^class mat3 {$/;"	c
+mat4	matm.h	/^    mat4( const float d = float(1.0) )  \/\/ Create a diagional matrix$/;"	f	class:mat4
+mat4	matm.h	/^    mat4( const mat4& m )$/;"	f	class:mat4
+mat4	matm.h	/^    mat4( const vec4& a, const vec4& b, const vec4& c, const vec4& d )$/;"	f	class:mat4
+mat4	matm.h	/^    mat4( float m00, float m10, float m20, float m30,   \/\/ column$/;"	f	class:mat4
+mat4	matm.h	/^class mat4 {$/;"	c
+matrixCompMult	matm.h	/^mat2 matrixCompMult( const mat2& A, const mat2& B ) {$/;"	f
+matrixCompMult	matm.h	/^mat3 matrixCompMult( const mat3& A, const mat3& B ) {$/;"	f
+matrixCompMult	matm.h	/^mat4 matrixCompMult( const mat4& A, const mat4& B ) {$/;"	f
+minus	matm.h	/^vec4 minus(const vec4& a, const vec4&  b )$/;"	f
+mvmult	matm.h	/^vec4 mvmult( const mat4& a, const vec4& b )$/;"	f
+normalize	vecm.h	/^vec2 normalize( const vec2& v ) {$/;"	f
+normalize	vecm.h	/^vec3 normalize( const vec3& v ) {$/;"	f
+normalize	vecm.h	/^vec4 normalize( const vec4& v ) {$/;"	f
+operator *	matm.h	/^    friend mat2 operator * ( const float s, const mat2& m )$/;"	f	class:mat2
+operator *	matm.h	/^    friend mat3 operator * ( const float s, const mat3& m )$/;"	f	class:mat3
+operator *	matm.h	/^    friend mat4 operator * ( const float s, const mat4& m )$/;"	f	class:mat4
+operator *	matm.h	/^    mat2 operator * ( const float s ) const $/;"	f	class:mat2
+operator *	matm.h	/^    mat2 operator * ( const mat2& m ) const {$/;"	f	class:mat2
+operator *	matm.h	/^    mat3 operator * ( const float s ) const $/;"	f	class:mat3
+operator *	matm.h	/^    mat3 operator * ( const mat3& m ) const {$/;"	f	class:mat3
+operator *	matm.h	/^    mat4 operator * ( const float s ) const $/;"	f	class:mat4
+operator *	matm.h	/^    mat4 operator * ( const mat4& m ) const {$/;"	f	class:mat4
+operator *	matm.h	/^    vec2 operator * ( const vec2& v ) const {  \/\/ m * v$/;"	f	class:mat2
+operator *	matm.h	/^    vec3 operator * ( const vec3& v ) const {  \/\/ m * v$/;"	f	class:mat3
+operator *	matm.h	/^    vec4 operator * ( const vec4& v ) const {  \/\/ m * v; _m[row][col]$/;"	f	class:mat4
+operator *	vecm.h	/^    friend vec2 operator * ( const float s, const vec2& v )$/;"	f	struct:vec2
+operator *	vecm.h	/^    friend vec3 operator * ( const float s, const vec3& v )$/;"	f	struct:vec3
+operator *	vecm.h	/^    friend vec4 operator * ( const float s, const vec4& v )$/;"	f	struct:vec4
+operator *	vecm.h	/^    vec2 operator * ( const float s ) const$/;"	f	struct:vec2
+operator *	vecm.h	/^    vec2 operator * ( const vec2& v ) const$/;"	f	struct:vec2
+operator *	vecm.h	/^    vec3 operator * ( const float s ) const$/;"	f	struct:vec3
+operator *	vecm.h	/^    vec3 operator * ( const vec3& v ) const$/;"	f	struct:vec3
+operator *	vecm.h	/^    vec4 operator * ( const float s ) const$/;"	f	struct:vec4
+operator *	vecm.h	/^    vec4 operator * ( const vec4& v ) const$/;"	f	struct:vec4
+operator *=	matm.h	/^    mat2& operator *= ( const float s ) {$/;"	f	class:mat2
+operator *=	matm.h	/^    mat2& operator *= ( const mat2& m ) {$/;"	f	class:mat2
+operator *=	matm.h	/^    mat3& operator *= ( const float s ) {$/;"	f	class:mat3
+operator *=	matm.h	/^    mat3& operator *= ( const mat3& m ) {$/;"	f	class:mat3
+operator *=	matm.h	/^    mat4& operator *= ( const float s ) {$/;"	f	class:mat4
+operator *=	matm.h	/^    mat4& operator *= ( const mat4& m ) {$/;"	f	class:mat4
+operator *=	vecm.h	/^    vec2& operator *= ( const float s )$/;"	f	struct:vec2
+operator *=	vecm.h	/^    vec2& operator *= ( const vec2& v )$/;"	f	struct:vec2
+operator *=	vecm.h	/^    vec3& operator *= ( const float s )$/;"	f	struct:vec3
+operator *=	vecm.h	/^    vec3& operator *= ( const vec3& v )$/;"	f	struct:vec3
+operator *=	vecm.h	/^    vec4& operator *= ( const float s )$/;"	f	struct:vec4
+operator *=	vecm.h	/^    vec4& operator *= ( const vec4& v )$/;"	f	struct:vec4
+operator +	matm.h	/^    mat2 operator + ( const mat2& m ) const$/;"	f	class:mat2
+operator +	matm.h	/^    mat3 operator + ( const mat3& m ) const$/;"	f	class:mat3
+operator +	matm.h	/^    mat4 operator + ( const mat4& m ) const$/;"	f	class:mat4
+operator +	vecm.h	/^    vec2 operator + ( const vec2& v ) const$/;"	f	struct:vec2
+operator +	vecm.h	/^    vec3 operator + ( const vec3& v ) const$/;"	f	struct:vec3
+operator +	vecm.h	/^    vec4 operator + ( const vec4& v ) const$/;"	f	struct:vec4
+operator +=	matm.h	/^    mat2& operator += ( const mat2& m ) {$/;"	f	class:mat2
+operator +=	matm.h	/^    mat3& operator += ( const mat3& m ) {$/;"	f	class:mat3
+operator +=	matm.h	/^    mat4& operator += ( const mat4& m ) {$/;"	f	class:mat4
+operator +=	vecm.h	/^    vec2& operator += ( const vec2& v )$/;"	f	struct:vec2
+operator +=	vecm.h	/^    vec3& operator += ( const vec3& v )$/;"	f	struct:vec3
+operator +=	vecm.h	/^    vec4& operator += ( const vec4& v )$/;"	f	struct:vec4
+operator -	matm.h	/^    mat2 operator - ( const mat2& m ) const$/;"	f	class:mat2
+operator -	matm.h	/^    mat3 operator - ( const mat3& m ) const$/;"	f	class:mat3
+operator -	matm.h	/^    mat4 operator - ( const mat4& m ) const$/;"	f	class:mat4
+operator -	vecm.h	/^    vec2 operator - ( const vec2& v ) const$/;"	f	struct:vec2
+operator -	vecm.h	/^    vec2 operator - () const \/\/ unary minus operator$/;"	f	struct:vec2
+operator -	vecm.h	/^    vec3 operator - ( const vec3& v ) const$/;"	f	struct:vec3
+operator -	vecm.h	/^    vec3 operator - () const  \/\/ unary minus operator$/;"	f	struct:vec3
+operator -	vecm.h	/^    vec4 operator - ( const vec4& v ) const$/;"	f	struct:vec4
+operator -	vecm.h	/^    vec4 operator - () const  \/\/ unary minus operator$/;"	f	struct:vec4
+operator -=	matm.h	/^    mat2& operator -= ( const mat2& m ) {$/;"	f	class:mat2
+operator -=	matm.h	/^    mat3& operator -= ( const mat3& m ) {$/;"	f	class:mat3
+operator -=	matm.h	/^    mat4& operator -= ( const mat4& m ) {$/;"	f	class:mat4
+operator -=	vecm.h	/^    vec2& operator -= ( const vec2& v )$/;"	f	struct:vec2
+operator -=	vecm.h	/^    vec3& operator -= ( const vec3& v )$/;"	f	struct:vec3
+operator -=	vecm.h	/^    vec4& operator -= ( const vec4& v )$/;"	f	struct:vec4
+operator /	matm.h	/^    mat2 operator \/ ( const float s ) const {$/;"	f	class:mat2
+operator /	matm.h	/^    mat3 operator \/ ( const float s ) const {$/;"	f	class:mat3
+operator /	matm.h	/^    mat4 operator \/ ( const float s ) const {$/;"	f	class:mat4
+operator /	vecm.h	/^    vec2 operator \/ ( const float s ) const {$/;"	f	struct:vec2
+operator /	vecm.h	/^    vec3 operator \/ ( const float s ) const {$/;"	f	struct:vec3
+operator /	vecm.h	/^    vec4 operator \/ ( const float s ) const {$/;"	f	struct:vec4
+operator /=	matm.h	/^    mat2& operator \/= ( const float s ) {$/;"	f	class:mat2
+operator /=	matm.h	/^    mat3& operator \/= ( const float s ) {$/;"	f	class:mat3
+operator /=	matm.h	/^    mat4& operator \/= ( const float s ) {$/;"	f	class:mat4
+operator /=	vecm.h	/^    vec2& operator \/= ( const float s ) {$/;"	f	struct:vec2
+operator /=	vecm.h	/^    vec3& operator \/= ( const float s ) {$/;"	f	struct:vec3
+operator /=	vecm.h	/^    vec4& operator \/= ( const float s ) {$/;"	f	struct:vec4
+operator <<	matm.h	/^    friend std::ostream& operator << ( std::ostream& os, const mat2& m )$/;"	f	class:mat2
+operator <<	matm.h	/^    friend std::ostream& operator << ( std::ostream& os, const mat3& m ) {$/;"	f	class:mat3
+operator <<	matm.h	/^    friend std::ostream& operator << ( std::ostream& os, const mat4& m ) {$/;"	f	class:mat4
+operator <<	vecm.h	/^    friend std::ostream& operator << ( std::ostream& os, const vec2& v ) {$/;"	f	struct:vec2
+operator <<	vecm.h	/^    friend std::ostream& operator << ( std::ostream& os, const vec3& v ) {$/;"	f	struct:vec3
+operator <<	vecm.h	/^    friend std::ostream& operator << ( std::ostream& os, const vec4& v ) {$/;"	f	struct:vec4
+operator >>	matm.h	/^    friend std::istream& operator >> ( std::istream& is, mat2& m )$/;"	f	class:mat2
+operator >>	matm.h	/^    friend std::istream& operator >> ( std::istream& is, mat3& m )$/;"	f	class:mat3
+operator >>	matm.h	/^    friend std::istream& operator >> ( std::istream& is, mat4& m )$/;"	f	class:mat4
+operator >>	vecm.h	/^    friend std::istream& operator >> ( std::istream& is, vec2& v )$/;"	f	struct:vec2
+operator >>	vecm.h	/^    friend std::istream& operator >> ( std::istream& is, vec3& v )$/;"	f	struct:vec3
+operator >>	vecm.h	/^    friend std::istream& operator >> ( std::istream& is, vec4& v )$/;"	f	struct:vec4
+operator []	matm.h	/^    const vec2& operator [] ( int i ) const { return _m[i]; }$/;"	f	class:mat2
+operator []	matm.h	/^    const vec3& operator [] ( int i ) const { return _m[i]; }$/;"	f	class:mat3
+operator []	matm.h	/^    const vec4& operator [] ( int i ) const { return _m[i]; }$/;"	f	class:mat4
+operator []	matm.h	/^    vec2& operator [] ( int i ) { return _m[i]; }$/;"	f	class:mat2
+operator []	matm.h	/^    vec3& operator [] ( int i ) { return _m[i]; }$/;"	f	class:mat3
+operator []	matm.h	/^    vec4& operator [] ( int i ) { return _m[i]; }$/;"	f	class:mat4
+operator []	vecm.h	/^    const float operator [] ( int i ) const { return *(&x + i); }$/;"	f	struct:vec2
+operator []	vecm.h	/^    const float operator [] ( int i ) const { return *(&x + i); }$/;"	f	struct:vec3
+operator []	vecm.h	/^    const float operator [] ( int i ) const { return *(&x + i); }$/;"	f	struct:vec4
+operator []	vecm.h	/^    float& operator [] ( int i ) { return *(&x + i); }$/;"	f	struct:vec2
+operator []	vecm.h	/^    float& operator [] ( int i ) { return *(&x + i); }$/;"	f	struct:vec3
+operator []	vecm.h	/^    float& operator [] ( int i ) { return *(&x + i); }$/;"	f	struct:vec4
+operator const float*	matm.h	/^    operator const float* () const$/;"	f	class:mat2
+operator const float*	matm.h	/^    operator const float* () const$/;"	f	class:mat3
+operator const float*	matm.h	/^    operator const float* () const$/;"	f	class:mat4
+operator const float*	vecm.h	/^    operator const float* () const$/;"	f	struct:vec2
+operator const float*	vecm.h	/^    operator const float* () const$/;"	f	struct:vec3
+operator const float*	vecm.h	/^    operator const float* () const$/;"	f	struct:vec4
+operator float*	matm.h	/^    operator float* ()$/;"	f	class:mat2
+operator float*	matm.h	/^    operator float* ()$/;"	f	class:mat3
+operator float*	matm.h	/^    operator float* ()$/;"	f	class:mat4
+operator float*	vecm.h	/^    operator float* ()$/;"	f	struct:vec2
+operator float*	vecm.h	/^    operator float* ()$/;"	f	struct:vec3
+operator float*	vecm.h	/^    operator float* ()$/;"	f	struct:vec4
+origin	template-rt.cpp	/^    vec4 origin;$/;"	m	struct:Ray	file:
+parseLine	template-rt.cpp	/^void parseLine(const vector<string>& vs)$/;"	f
+printm	matm.h	/^void printm(const mat4 a)$/;"	f
+printv	matm.h	/^void printv(const vec4& a )$/;"	f
+render	template-rt.cpp	/^void render()$/;"	f
+renderPixel	template-rt.cpp	/^void renderPixel(int ix, int iy)$/;"	f
+saveFile	template-rt.cpp	/^void saveFile()$/;"	f
+savePPM	template-rt.cpp	/^void savePPM(int Width, int Height, char* fname, unsigned char* pixels) $/;"	f
+setColor	template-rt.cpp	/^void setColor(int ix, int iy, const vec4& color)$/;"	f
+toFloat	template-rt.cpp	/^float toFloat(const string& s)$/;"	f
+toVec4	template-rt.cpp	/^vec4 toVec4(const string& s1, const string& s2, const string& s3)$/;"	f
+trace	template-rt.cpp	/^vec4 trace(const Ray& ray)$/;"	f
+transpose	matm.h	/^mat2 transpose( const mat2& A ) {$/;"	f
+transpose	matm.h	/^mat3 transpose( const mat3& A ) {$/;"	f
+transpose	matm.h	/^mat4 transpose( const mat4& A ) {$/;"	f
+vec2	vecm.h	/^    vec2( const vec2& v )$/;"	f	struct:vec2
+vec2	vecm.h	/^    vec2( float s = float(0.0) ) :$/;"	f	struct:vec2
+vec2	vecm.h	/^    vec2( float x, float y ) :$/;"	f	struct:vec2
+vec2	vecm.h	/^struct vec2 {$/;"	s
+vec3	vecm.h	/^    vec3( const vec2& v, const float f ) { x = v.x;  y = v.y;  z = f; }$/;"	f	struct:vec3
+vec3	vecm.h	/^    vec3( const vec3& v ) { x = v.x;  y = v.y;  z = v.z; }$/;"	f	struct:vec3
+vec3	vecm.h	/^    vec3( float s = float(0.0) ) :$/;"	f	struct:vec3
+vec3	vecm.h	/^    vec3( float x, float y, float z ) :$/;"	f	struct:vec3
+vec3	vecm.h	/^struct vec3 {$/;"	s
+vec4	vecm.h	/^    vec4( const vec2& v, const float z, const float w ) : z(z), w(w)$/;"	f	struct:vec4
+vec4	vecm.h	/^    vec4( const vec3& v, const float w = 1.0 ) : w(w)$/;"	f	struct:vec4
+vec4	vecm.h	/^    vec4( const vec4& v ) { x = v.x;  y = v.y;  z = v.z;  w = v.w; }$/;"	f	struct:vec4
+vec4	vecm.h	/^    vec4( float s = float(0.0) ) :$/;"	f	struct:vec4
+vec4	vecm.h	/^    vec4( float x, float y, float z, float w ) :$/;"	f	struct:vec4
+vec4	vecm.h	/^struct vec4 {$/;"	s
+w	vecm.h	/^    float  w;$/;"	m	struct:vec4
+x	vecm.h	/^    float  x;$/;"	m	struct:vec2
+x	vecm.h	/^    float  x;$/;"	m	struct:vec3
+x	vecm.h	/^    float  x;$/;"	m	struct:vec4
+y	vecm.h	/^    float  y;$/;"	m	struct:vec2
+y	vecm.h	/^    float  y;$/;"	m	struct:vec3
+y	vecm.h	/^    float  y;$/;"	m	struct:vec4
+z	vecm.h	/^    float  z;$/;"	m	struct:vec3
+z	vecm.h	/^    float  z;$/;"	m	struct:vec4
