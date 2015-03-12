@@ -11,11 +11,12 @@
 #include <vector>
 #include <string.h>
 #include <assert.h>
+#include <limits>
 #ifdef DEBUG_MODE
-#define TRACE_DEBUG
+//#define TRACE_DEBUG
 #define SPECU_DEBUG
-#define DIFFU_DEBUG
-#define AMBIE_DEBUG
+//#define DIFFU_DEBUG
+//#define AMBIE_DEBUG
 #endif
 using namespace std;
 
@@ -215,14 +216,16 @@ void setColor(int ix, int iy, const vec4& color)
 // Intersection routine
 
 // TODO: add your ray-sphere intersection routine here.
-float get_t(const sphere &S, const Ray &ray);
+bool get_t(const vector<sphere> &S, const Ray &ray, int& sphere_index, float& t_min);
 
 #define get_hitpoint(matrix, ray, t)  ((matrix) * (ray).origin + (t) * (matrix) * (ray).dir)
 #define get_normal(center, hitpoint) ((hitpoint) - center)
-
+#define max(a,b) (((a)>(b))?(a):(b))
 vec4 get_spec_effects(const vector<light> &lights, const sphere& sphere, const vec4& hit_point, const Ray &ray, const vec4& normal);
 vec4 get_diffuse_effects(const vector<light> &lights, const sphere& sphere, const vec4& hit_point, const vec4& normal);
 vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S);
+float intersect(const sphere& S, Ray &ray);
+
 
 // -------------------------------------------------------------------
 // Ray tracing
@@ -232,25 +235,18 @@ vec4 trace(const Ray& ray)
 	sphere* g_sphere;	
 	float t = 0.0;
 	// for each sphere
-	for( int i = 0; i < (int)g_spheres.size(); i++) {
-		// get t value
-		float ti = get_t(g_spheres[i], ray);
-		
-		// if t is invalid value, current sphere doesn't intersect with ray
-		if(ti <= 1.0) 		continue;
-		// if t hasn't assigned a value or current t is smaller than t
-		else if(t == 0.0 || ti < t) {
-			t = ti;
-			g_sphere = &g_spheres[i];
-		}
-	}
-
+	int sphere_index = 0;
+	get_t(g_spheres, ray,sphere_index, t);
+	
+	g_sphere = &g_spheres[sphere_index];
 	// if no t values for a point, return background color
-	if(t == 0.0)		return background;
+	if(t == std::numeric_limits<float>::infinity())		return background;
 	
 	vec4 hit_point = get_hitpoint(1, ray, t);
 	vec4 unit_hit_point = get_hitpoint(g_sphere->inverse_matrix, ray, t);
-	vec4 normal_vec = normalize(get_normal(vec4(0,0,0,1), unit_hit_point));
+
+	vec4 normal_vec = get_normal(vec4(0,0,0,1), unit_hit_point);
+	
 	assert(normal_vec.w == 0);
 #ifdef TRACE_DEBUG 
 	//assert(normal_vec.w == 0);
@@ -295,34 +291,44 @@ vec4 trace(const Ray& ray)
 
 vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S){
 
-	vec4 color = S.ka * g_ambient * S.color_s + spec_effects + diffuse_effects * S.color_s;
+	vec4 color = S.ka * g_ambient * S.color_s + spec_effects * S.ks + diffuse_effects * S.color_s;
 
 	return color;
 }
 
 // ks * (R * V)^n
 vec4 get_spec_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {
-	
+
+	// V vector from origin to hit point
+	vec4 V = ray.origin - hit_point;	
+	assert(V.w == 0);
+	V = normalize(V);
+	if(dot(V, normal) < 0) {
+		return vec4(0,0,0,0);;
+	}
+	vec4 uNormal = normal;
 	vec4 specular(0,0,0,0);
 	for(int i = 0; i < (int) lights.size(); i++) {
+		assert(uNormal.w == 0);
+		// claculat L vector and normalize
 		vec4 L = lights[i].position - hit_point;
 		assert(L.w == 0);
-		assert(normal.w == 0);
 		L = normalize(L);
-		vec4 R = 2 * normal * dot(normal,L) - L;
+		// R vector
+		vec4 R = 2 * uNormal * dot(uNormal,L) - L;
 		assert(R.w == 0);
 		R = normalize(R);
-		vec4 V = ray.origin - hit_point;	
-		assert(V.w == 0);
-		V = normalize(V);
 #ifdef SPECU_DEBUG 
+		if(S.name == "s2" && i == 2) {
 		cout << S.name << " specular dot(R,V)=" << dot(R,V) << endl;
 		cout << S.name << " specular R=" << R << endl;
 		cout << S.name << " specular V=" << V << endl;
 		cout << S.name << " specular hitpoint=" << hit_point << endl;
 		cout << S.name << " specular lightP= " << lights[i].position << endl;
+		}
 #endif
-		specular += lights[i].i_light * S.ks * pow(dot(R,V),S.n);
+		
+		specular += lights[i].i_light * pow(max(dot(R,V),0),S.n) * vec4(1,1,1,0);
 	}
 #ifdef SPECU_DEBUG 
 	cout <<S.name << " specular=" << specular << endl;
@@ -353,34 +359,65 @@ vec4 get_diffuse_effects(const vector<light> &lights, const sphere& S, const vec
 
 	return diffuse;
 }
-float get_t(const sphere &S, const Ray &ray) {
-	// calculate S' and C'
-	vec4 iS = S.inverse_matrix * ray.origin;
-	vec4 iC = S.inverse_matrix * ray.dir;
-	// normalize iC
-	iC = normalize(iC);
-	iS.w = 0;
+float intersect(const sphere& S, const Ray &ray) {
+	vec4 S_inverse = S.inverse_matrix * ray.origin;
+	vec4 C_inverse = S.inverse_matrix * ray.dir;
+	assert(C_inverse.w == 0);
+	S_inverse.w = 0;
 
-	// quadratic formular
-	float A = length(iC) * length(iC);
-	float B = dot(iS,iC);
-	float C = (length(iS) * length(iS)) - 1.0;
+	// calculate A
+	float A = pow(length(C_inverse),2);
+	// calculate B = S' * C'
+	float B = dot(S_inverse, C_inverse);	
+	// calculate C
+	float C = pow(length(S_inverse), 2) -1.0;
 
-	float n = B*B-A*C;
-#ifdef DIFFU 
-	if(n > 0.0) 
-		cout << S.name << ": n=" << n << endl;
+	float K = pow(B,2) - A * C;
+		
+	if(K >= 0) {
+		// one result
+		float t1 = -1 * B / A + sqrt(K) /A;
+		float t2 = -1 * B / A - sqrt(K) /A;
+		if(t1 < t2) {
+			if(t1 > 1) return t1;
+			else if(t2 > 1) return t2;
+			else return 0;
+		}
+		else {
+			if(t2 > 1) return t2;
+			else if(t1 > 1) return t1;
+			else return 0;
+		}	
+	}
+	else
+	{
+		// ray doesn't touch sphere
+		return 0;
+	}
+}
+#define GET_T_DEBUG
+bool get_t(const vector<sphere> &S, const Ray &ray, int& sphere_index, float& t_min) {
+	// for each object
+	t_min = std:: numeric_limits<float>::infinity();
 
+
+	for( int i = 0; i < (int)S.size(); i++ ) {
+#ifdef GET_T_DEBUG
+		if(i == 3 && ray.dir.x == 0 && ray.dir.y == 0) {
+			cout << "get_t dir=" << ray.dir << " " << endl;
+			cout << "get_t t=" << intersect(S[i],ray) << " " << endl;
+		}
 #endif
-	if(n < 0.0)
-        return 0.0;
-    
-    float th = -1 * B/A + sqrt(B*B-A*C)/A;
-	float th2 = -1 * B/A - sqrt(B*B-A*C)/A;
-    
-	// return lowest t     >1?
-	return (th < th2)? th: th2;
-	
+		float t = 0;
+		// intersect will return 0 if no intersection or behind the screen
+		if((t = intersect(S[i], ray)) != 0.0) {
+			if(t < t_min) {
+				sphere_index = i;
+				t_min = t;
+			}
+		}
+	}
+	return (t_min != std::numeric_limits<float>::infinity());
 }
 
 vec4 getDir(int ix, int iy)
@@ -392,7 +429,7 @@ vec4 getDir(int ix, int iy)
 	double y = g_bottom + ((float)iy / g_height) * (g_top - g_bottom);
 	
 	vec4 dir = vec4(x,y,-1*g_near,0);
-	dir = normalize(dir);
+	//dir = normalize(dir);
     return dir;
 }
 
@@ -450,8 +487,10 @@ void saveFile()
     unsigned char* buf = new unsigned char[g_width * g_height * 3];
     for (int y = 0; y < g_height; y++)
         for (int x = 0; x < g_width; x++)
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++) {
+				if(((float*)g_colors[y*g_width+x])[i] > 1) ((float*)g_colors[y*g_width+x])[i] = 1;
                 buf[y*g_width*3+x*3+i] = (unsigned char)(((float*)g_colors[y*g_width+x])[i] * 255.9f);
+			}
     
     // TODO: change file name based on input file name.
     char* out = (char*) malloc(outputfile.size() + 1);

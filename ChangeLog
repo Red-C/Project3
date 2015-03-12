@@ -1,0 +1,15 @@
+BUGS: some floating points lost its precision,
+testAmbient(90% correct)
+testBackground(90% correct)
+testBehind(90% correct) -- why just gray 
+colortestDiffuse(70% correct) -- color is more bright than actual result
+testIllum(40% correct) -- error with specular on blue sphere, the cone at front is too big, 
+	something wrong with diffuse on green sphere and red sphere
+testImgPlance(60% correct) -- image is larger than actual result
+testIntersection(80% correct) -- little bit smaller?delusion?
+testParsing(0% correct) -- do this part in another branch
+testReflection(0% correct) -- do this part in another branch
+testSample(0% correct) -- might because special case(over 1? less than 0? just maybe)
+testShadow(0% correct) -- do this part in another branch
+testSpecular.ppm(60% correct) -- looks great, but different, too many spec
+

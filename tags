@@ -4,7 +4,8 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-DEBUG_MODE	template-rt.cpp	13;"	d	file:
+AMBIE_DEBUG	template-rt.cpp	18;"	d	file:
+DIFFU_DEBUG	template-rt.cpp	17;"	d	file:
 DegreesToRadians	vecm.h	/^const float  DegreesToRadians = float(M_PI \/ 180.0);$/;"	v
 DivideByZeroTolerance	vecm.h	/^const float  DivideByZeroTolerance = float(1.0e-07);$/;"	v
 Error	matm.h	716;"	d
@@ -20,8 +21,10 @@ Ray	template-rt_copy.cpp	/^struct Ray$/;"	s	file:
 RotateX	matm.h	/^mat4 RotateX( const float theta )$/;"	f
 RotateY	matm.h	/^mat4 RotateY( const float theta )$/;"	f
 RotateZ	matm.h	/^mat4 RotateZ( const float theta )$/;"	f
+SPECU_DEBUG	template-rt.cpp	16;"	d	file:
 Scale	matm.h	/^mat4 Scale( const float x, const float y, const float z )$/;"	f
 Scale	matm.h	/^mat4 Scale( const vec3& v )$/;"	f
+TRACE_DEBUG	template-rt.cpp	15;"	d	file:
 Translate	matm.h	/^mat4 Translate( const float x, const float y, const float z )$/;"	f
 Translate	matm.h	/^mat4 Translate( const vec3& v )$/;"	f
 Translate	matm.h	/^mat4 Translate( const vec4& v )$/;"	f
@@ -73,9 +76,11 @@ g_width	template-rt_copy.cpp	/^int g_width;$/;"	v
 getDir	template-rt.cpp	/^vec4 getDir(int ix, int iy)$/;"	f
 getDir	template-rt_copy.cpp	/^vec4 getDir(int ix, int iy)$/;"	f
 getT	template-rt_copy.cpp	/^float getT(vec4 S, vec4 c)$/;"	f
-get_hitpoint	template-rt.cpp	/^vec4 get_hitpoint(const sphere &sphere, const Ray& ray) {$/;"	f
-get_hitpoint	template-rt.cpp	215;"	d	file:
-get_normal	template-rt.cpp	216;"	d	file:
+get_color	template-rt.cpp	/^vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S){$/;"	f
+get_diffuse_effects	template-rt.cpp	/^vec4 get_diffuse_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const vec4& normal) {$/;"	f
+get_hitpoint	template-rt.cpp	220;"	d	file:
+get_normal	template-rt.cpp	221;"	d	file:
+get_spec_effects	template-rt.cpp	/^vec4 get_spec_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {$/;"	f
 get_t	template-rt.cpp	/^float get_t(const sphere &S, const Ray &ray) {$/;"	f
 i_light	template-rt.cpp	/^	vec4 i_light;$/;"	m	struct:light	file:
 i_light	template-rt_copy.cpp	/^	vec4 i_light;$/;"	m	struct:light	file:
@@ -266,7 +271,6 @@ sphere	template-rt.cpp	/^} sphere;$/;"	t	typeref:struct:sphere	file:
 sphere	template-rt_copy.cpp	/^	sphere(string name = "", mat4 model = mat4(), vec4 c = vec4(), vec4 center = vec4(),$/;"	f	struct:sphere
 sphere	template-rt_copy.cpp	/^typedef struct sphere {$/;"	s	file:
 sphere	template-rt_copy.cpp	/^} sphere;$/;"	t	typeref:struct:sphere	file:
-sphere_intersection	template-rt.cpp	/^bool sphere_intersection(const Ray &ray, sphere S, vec4 &hitPoint) {$/;"	f
 toFloat	template-rt.cpp	/^float toFloat(const string& s)$/;"	f
 toFloat	template-rt_copy.cpp	/^float toFloat(const string& s)$/;"	f
 toVec4	template-rt.cpp	/^vec4 toVec4(const string& s1, const string& s2, const string& s3)$/;"	f
