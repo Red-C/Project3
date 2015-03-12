@@ -4,27 +4,27 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-AMBIE_DEBUG	template-rt.cpp	18;"	d	file:
-DIFFU_DEBUG	template-rt.cpp	17;"	d	file:
 DegreesToRadians	vecm.h	/^const float  DegreesToRadians = float(M_PI \/ 180.0);$/;"	v
 DivideByZeroTolerance	vecm.h	/^const float  DivideByZeroTolerance = float(1.0e-07);$/;"	v
 Error	matm.h	716;"	d
 Frustum	matm.h	/^mat4 Frustum( const float left, const float right,$/;"	f
+GET_T_DEBUG	template-rt.cpp	410;"	d	file:
+ISSHADERAYBLOCKED_DEBUG	template-rt.cpp	336;"	d	file:
 InvertMatrix	matm.h	/^bool InvertMatrix(const mat4& m4, mat4& m4InvOut)$/;"	f
 LookAt	matm.h	/^mat4 LookAt( const vec4& eye, const vec4& at, const vec4& up )$/;"	f
 M_PI	vecm.h	17;"	d
 Ortho	matm.h	/^mat4 Ortho( const float left, const float right,$/;"	f
 Ortho2D	matm.h	/^mat4 Ortho2D( const float left, const float right,$/;"	f
 Perspective	matm.h	/^mat4 Perspective( const float fovy, const float aspect,$/;"	f
-Ray	template-rt.cpp	/^struct Ray$/;"	s	file:
+Ray	template-rt.cpp	/^typedef struct Ray$/;"	s	file:
+Ray	template-rt.cpp	/^} Ray;$/;"	t	typeref:struct:Ray	file:
 Ray	template-rt_copy.cpp	/^struct Ray$/;"	s	file:
 RotateX	matm.h	/^mat4 RotateX( const float theta )$/;"	f
 RotateY	matm.h	/^mat4 RotateY( const float theta )$/;"	f
 RotateZ	matm.h	/^mat4 RotateZ( const float theta )$/;"	f
-SPECU_DEBUG	template-rt.cpp	16;"	d	file:
+SPECU_DEBUG	template-rt.cpp	17;"	d	file:
 Scale	matm.h	/^mat4 Scale( const float x, const float y, const float z )$/;"	f
 Scale	matm.h	/^mat4 Scale( const vec3& v )$/;"	f
-TRACE_DEBUG	template-rt.cpp	15;"	d	file:
 Translate	matm.h	/^mat4 Translate( const float x, const float y, const float z )$/;"	f
 Translate	matm.h	/^mat4 Translate( const vec3& v )$/;"	f
 Translate	matm.h	/^mat4 Translate( const vec4& v )$/;"	f
@@ -77,17 +77,21 @@ getDir	template-rt.cpp	/^vec4 getDir(int ix, int iy)$/;"	f
 getDir	template-rt_copy.cpp	/^vec4 getDir(int ix, int iy)$/;"	f
 getT	template-rt_copy.cpp	/^float getT(vec4 S, vec4 c)$/;"	f
 get_color	template-rt.cpp	/^vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S){$/;"	f
-get_diffuse_effects	template-rt.cpp	/^vec4 get_diffuse_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const vec4& normal) {$/;"	f
-get_hitpoint	template-rt.cpp	220;"	d	file:
-get_normal	template-rt.cpp	221;"	d	file:
-get_spec_effects	template-rt.cpp	/^vec4 get_spec_effects(const vector<light> &lights, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {$/;"	f
-get_t	template-rt.cpp	/^float get_t(const sphere &S, const Ray &ray) {$/;"	f
+get_diffuse_effects	template-rt.cpp	/^vec4 get_diffuse_effects(light &i_light, const sphere& S, const vec4& hit_point, const vec4& normal) {$/;"	f
+get_hitpoint	template-rt.cpp	221;"	d	file:
+get_normal	template-rt.cpp	222;"	d	file:
+get_spec_effects	template-rt.cpp	/^vec4 get_spec_effects(light &i_light, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {$/;"	f
+get_t	template-rt.cpp	/^bool get_t(const vector<sphere> &S, const Ray &ray, int& sphere_index, float& t_min) {$/;"	f
 i_light	template-rt.cpp	/^	vec4 i_light;$/;"	m	struct:light	file:
 i_light	template-rt_copy.cpp	/^	vec4 i_light;$/;"	m	struct:light	file:
 identity	matm.h	/^mat4 identity()$/;"	f
 intensity_ambient	template-rt_copy.cpp	/^vec4 intensity_ambient;$/;"	v
+intersect	template-rt.cpp	/^float intersect(const sphere& S, const Ray &ray) {$/;"	f
 inverse_matrix	template-rt.cpp	/^	mat4 inverse_matrix;$/;"	m	struct:sphere	file:
 inverse_matrix	template-rt_copy.cpp	/^	mat4 inverse_matrix;$/;"	m	struct:sphere	file:
+isShadeRayBlocked	template-rt.cpp	/^bool isShadeRayBlocked(const vector<sphere> &spheres, const light &L, const vec4 &hit_point, const int sphere_index) {$/;"	f
+is_point	template-rt.cpp	225;"	d	file:
+is_vector	template-rt.cpp	224;"	d	file:
 ka	template-rt.cpp	/^	double ka;	\/\/ amibient coefficient$/;"	m	struct:sphere	file:
 kd	template-rt.cpp	/^	double kd;	\/\/ diffuse surface reflactance coefficient$/;"	m	struct:sphere	file:
 kr	template-rt.cpp	/^	double kr; \/\/ reflection$/;"	m	struct:sphere	file:
@@ -125,6 +129,7 @@ matrix	template-rt_copy.cpp	/^	mat4 matrix;$/;"	m	struct:sphere	file:
 matrixCompMult	matm.h	/^mat2 matrixCompMult( const mat2& A, const mat2& B ) {$/;"	f
 matrixCompMult	matm.h	/^mat3 matrixCompMult( const mat3& A, const mat3& B ) {$/;"	f
 matrixCompMult	matm.h	/^mat4 matrixCompMult( const mat4& A, const mat4& B ) {$/;"	f
+max	template-rt.cpp	223;"	d	file:
 minus	matm.h	/^vec4 minus(const vec4& a, const vec4&  b )$/;"	f
 mvmult	matm.h	/^vec4 mvmult( const mat4& a, const vec4& b )$/;"	f
 n	template-rt.cpp	/^	double n; 	\/\/ specular exponent$/;"	m	struct:sphere	file:
