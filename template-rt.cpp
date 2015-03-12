@@ -12,9 +12,10 @@
 #include <string.h>
 #include <assert.h>
 #include <limits>
+#define DEBUG_MODE
 #ifdef DEBUG_MODE
-//#define TRACE_DEBUG
-#define SPECU_DEBUG
+#define TRACE_DEBUG
+//#define SPECU_DEBUG
 //#define DIFFU_DEBUG
 //#define AMBIE_DEBUG
 #endif
@@ -233,7 +234,7 @@ bool isShadeRayBlocked(const vector<sphere> &spheres, const light &L, const vec4
 
 // -------------------------------------------------------------------
 // Ray tracing
-vec4 trace(const Ray& ray)
+vec4 trace(const Ray& ray, int depth)
 {
     // TODO: implement your ray tracing routine here.
 	sphere* g_sphere;	
@@ -244,7 +245,10 @@ vec4 trace(const Ray& ray)
 	
 	g_sphere = &g_spheres[sphere_index];
 	// if no t values for a point, return background color
-	if(t == std::numeric_limits<float>::infinity())		return background;
+	if(t == std::numeric_limits<float>::infinity()){
+		if(depth != 0) return vec4(0,0,0,0);
+		return background;
+	}
 
 	// generate hit_point, and unit normal vector
 	vec4 hit_point = get_hitpoint(1, ray, t);
@@ -273,12 +277,33 @@ vec4 trace(const Ray& ray)
 	}
 	// multiply by the specular and diffuse components
 	vec4 color = get_color(spec_effects, diffuse_effects, g_ambient, *g_sphere);
+
+#ifdef TRACE_DEBUG 
+	// if(t > 0.0) 
+	//	cout << "trace: " << g_sphere->name << " t=" << t << endl;
+	if(g_sphere->name == "s1")
+		cout << "trace: before" << "Sphere: " << g_sphere->name << " color:" << color << " depth:" << depth << endl;
+#endif
+
+	if(depth == DEPTH) return color;
+	else {
+		// calculate new ray
+		Ray new_ray;
+		new_ray.origin = hit_point;
+		new_ray.dir = -2 * dot(normal_altered_vec, ray.dir) * normal_altered_vec + ray.dir;
+		new_ray.dir = normalize(new_ray.dir);
+		new_ray.dir = 0.0001 * new_ray.dir;
+		vec4 ref_color = trace(new_ray, ++depth);
+		color += g_sphere->kr * ref_color;
+
+	}
 	
 
 #ifdef TRACE_DEBUG 
 	// if(t > 0.0) 
 	//	cout << "trace: " << g_sphere->name << " t=" << t << endl;
-	cout << "trace:" << "Sphere: " << g_sphere->name << " color:" << color << endl;
+	if(g_sphere->name == "s1")
+		cout << "trace:" << "Sphere: " << g_sphere->name << " color:" << color << " depth:" << depth << endl;
 #endif
 
     return color;
@@ -454,8 +479,8 @@ void renderPixel(int ix, int iy)
     Ray ray;
     ray.origin = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     ray.dir = getDir(ix, iy);
-    vec4 color = trace(ray);
-#ifdef DEBUG_MODE
+    vec4 color = trace(ray, 0);
+#ifdef RENDER_DEBUG 
 	if(color.x != background.x && color.y != background.y && color.z != background.z)
 		cout << "color will be renderred=" << color << endl;
 #endif 
