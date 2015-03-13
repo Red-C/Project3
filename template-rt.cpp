@@ -12,13 +12,6 @@
 #include <string.h>
 #include <assert.h>
 #include <limits>
-#define DEBUG_MODE
-#ifdef DEBUG_MODE
-#define TRACE_DEBUG
-//#define SPECU_DEBUG
-//#define DIFFU_DEBUG
-//#define AMBIE_DEBUG
-#endif
 using namespace std;
 
 
@@ -31,7 +24,6 @@ typedef struct Ray
     vec4 dir;
 } Ray;
 
-// TODO: add structs for spheres, lights and anything else you may need.
 typedef struct sphere {
 	mat4 inverse_matrix;
 	mat4 matrix;
@@ -109,7 +101,6 @@ float toFloat(const string& s)
 
 void parseLine(const vector<string>& vs)
 {
-    //TODO: add parsing of NEAR, LEFT, RIGHT, BOTTOM, TOP, SPHERE, LIGHT, BACK, AMBIENT, OUTPUT.
     if (vs[0] == "RES")
     {
         g_width = (int)toFloat(vs[1]);
@@ -146,7 +137,6 @@ void parseLine(const vector<string>& vs)
         g_spheres.push_back(g_sphere);
 	}
 	else if(vs[0] == "LIGHT"){
-	// TODO load light 
 		 light t;
 		 t.name = vs[1];
 		 t.position.x = toFloat(vs[2]);
@@ -216,7 +206,6 @@ void setColor(int ix, int iy, const vec4& color)
 // -------------------------------------------------------------------
 // Intersection routine
 
-// TODO: add your ray-sphere intersection routine here.
 bool get_t(const vector<sphere> &S, const Ray &ray, int& sphere_index, float& t_min);
 
 #define get_hitpoint(matrix, ray, t)  ((matrix) * (ray).origin + (t) * (matrix) * (ray).dir)
@@ -225,8 +214,9 @@ bool get_t(const vector<sphere> &S, const Ray &ray, int& sphere_index, float& t_
 #define is_vector(V)   	((V).w == 0)
 #define is_point(V)		((V).w == 1)
 #define DEPTH 3
+
 vec4 get_spec_effects(light &lights, const sphere& sphere, const vec4& hit_point, const Ray &ray, const vec4& normal);
-vec4 get_diffuse_effects(light &lights, const sphere& sphere, const vec4& hit_point, const vec4& normal);
+vec4 get_diffuse_effects(light &lights, const vec4& hit_point, const vec4& normal);
 vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S);
 float intersect(const sphere& S, const Ray &ray, float near_plane);
 bool isShadeRayBlocked(const vector<sphere> &spheres, const light &L, const vec4 &hit_point, const int sphere_index);
@@ -236,28 +226,36 @@ bool isShadeRayBlocked(const vector<sphere> &spheres, const light &L, const vec4
 // Ray tracing
 vec4 trace(const Ray& ray, int depth)
 {
-    // TODO: implement your ray tracing routine here.
-	sphere* g_sphere;	
+	
+	sphere* g_sphere;					
 	float t = 0.0;
-	// for each sphere
+	
+	// use to hold closest sphere index
 	int sphere_index = 0;
+	// get_t will return sphere_index and value t by reference, it also return boolean value to represent if it is a valid t value
 	get_t(g_spheres, ray,sphere_index, t);
 	
+	// get pointer to point to the closest sphere
 	g_sphere = &g_spheres[sphere_index];
+	
 	// if no t values for a point, return background color
 	if(t == std::numeric_limits<float>::infinity()){
+		// if current ray is a reflect ray, return 0 vector, the upper recursive func will use this to times coef. of reflection
 		if(depth != 0) return vec4(0,0,0,0);
+		// if ray from eye doesn't touch any object, return background color
 		return background;
 	}
 
-	// generate hit_point, and unit normal vector
+	// hit_point = S + t*C 
 	vec4 hit_point = get_hitpoint(1, ray, t);
+	// hit_point = S' + t*C'
 	vec4 unit_hit_point = get_hitpoint(g_sphere->inverse_matrix, ray, t);
+	// generate normal vector of untransform sphere
 	vec4 normal_vec = get_normal(vec4(0,0,0,1), unit_hit_point);
 
-	// generate normal vector
-	mat4 iM = g_sphere->inverse_matrix;
-	vec4 normal_altered_vec = transpose(iM) * normal_vec; 
+	// generate normal vector on transform sphere base on normal_vec above
+	// because the value of w after transpose inverse matrix times normal vector doesn't equals to 0, set it to 0
+	vec4 normal_altered_vec = transpose(g_sphere->inverse_matrix) * normal_vec; 
 	normal_altered_vec.w = 0;
 	normal_altered_vec = normalize(normal_altered_vec);
 
@@ -266,130 +264,119 @@ vec4 trace(const Ray& ray, int depth)
 	// for every light source 
 	for( int i = 0; i < (int) g_lights.size(); i++) {
 	
+		// if there is object in between of current light and point on sphere,(under a shadow ray), ignore it
 		if(isShadeRayBlocked(g_spheres, g_lights[i], hit_point, sphere_index))  continue;
 
-		// calculate specular effects
+		// sum up all specular effects
+		// calculate each specular effects from each light in (g_lights) onto the sphere(g_sphere) at (hit_point) with ray and normal vector
 		spec_effects += get_spec_effects(g_lights[i], *g_sphere, hit_point, ray, normal_altered_vec);
 
-		// calculate diffuse effects
-		diffuse_effects += get_diffuse_effects(g_lights[i], *g_sphere, hit_point, normal_altered_vec);
+		// sum up all specular effects
+		// calculate each diffuse effects from each light in (g_lights) onto the sphere at (hit_point) with normal_vector(normal_altered_vec)
+		diffuse_effects += get_diffuse_effects(g_lights[i], hit_point, normal_altered_vec);
 		
 	}
-	// multiply by the specular and diffuse components
+	// spec_effects = I_L * (R*V)^n
+	// diffuse_effects = I_L*(N*L)
+	// get_color = I_L * k_d * (N*L)*C_sphere + I_L * k_s * (R*V)^n + k_a * I_a * C_sphere
 	vec4 color = get_color(spec_effects, diffuse_effects, g_ambient, *g_sphere);
 
-#ifdef TRACE_DEBUG 
-	// if(t > 0.0) 
-	//	cout << "trace: " << g_sphere->name << " t=" << t << endl;
-	if(g_sphere->name == "s1")
-		cout << "trace: before" << "Sphere: " << g_sphere->name << " color:" << color << " depth:" << depth << endl;
-#endif
-
+	
+	// if this is end of recursive, return color of sphere without reflective light
 	if(depth == DEPTH) return color;
 	else {
-		// calculate new ray
+		// calculate ray from current hitpoint to the new dir
 		Ray new_ray;
 		new_ray.origin = hit_point;
+		// calculate new dir = -2*(N*C)*N+C
 		new_ray.dir = -2 * dot(normal_altered_vec, ray.dir) * normal_altered_vec + ray.dir;
 		new_ray.dir = normalize(new_ray.dir);
+		// set next image plance very close to the hitpoint
+		// because it is already normalized, the length is 1, the image plane will be 0.0001 unit from hitpoint
 		new_ray.dir = 0.0001 * new_ray.dir;
+		// call trace function recursively
 		vec4 ref_color = trace(new_ray, ++depth);
+		// add the colors that reflected from other objects
 		color += g_sphere->kr * ref_color;
 
 	}
-	
-
-#ifdef TRACE_DEBUG 
-	// if(t > 0.0) 
-	//	cout << "trace: " << g_sphere->name << " t=" << t << endl;
-	if(g_sphere->name == "s1")
-		cout << "trace:" << "Sphere: " << g_sphere->name << " color:" << color << " depth:" << depth << endl;
-#endif
 
     return color;
 }
 
 vec4 get_color(const vec4 &spec_effects, const vec4 &diffuse_effects, const vec4& g_ambient, const sphere& S){
 
-	vec4 color = S.ka * g_ambient * S.color_s + spec_effects * S.ks + diffuse_effects * S.color_s;
+	vec4 color = S.ka * g_ambient * S.color_s + spec_effects * S.ks + diffuse_effects * S.color_s * S.kd;
 
 	return color;
 }
 
 // ks * (R * V)^n
+// all vector in spec is unit vector
 vec4 get_spec_effects(light &i_light, const sphere& S, const vec4& hit_point, const Ray &ray, const vec4& normal) {
 
 	// V vector from origin to hit point
 	vec4 V = ray.origin - hit_point;	
-	assert(V.w == 0);
 	V = normalize(V);
+	
+	// if dot(V,N) < 0, means angle is > 90, ignore current spec effect
 	if(dot(V, normal) < 0) {
-		return vec4(0,0,0,0);;
+		return vec4(0,0,0,0);
 	}
+	
 	vec4 specular(0,0,0,0);
-	//
-	// claculat L vector and normalize
+	
+	// claculate L vector (from hit point to light)
 	vec4 L = i_light.position - hit_point;
-	assert(L.w == 0);
 	L = normalize(L);
-	// R vector
+	
+	// R vector = 2*N *(N*L)-L
 	vec4 R = 2 * normal * dot(normal,L) - L;
-	assert(R.w == 0);
 	R = normalize(R);
+
+	// specular effect = I_light * (R,V)^n
+	// if dot R,V smaller than 0 cast to 0,..forgot why
 	specular = i_light.i_light * pow(max(dot(R,V),0),S.n) * vec4(1,1,1,0);
 
 	return specular;
 }
 // kd * (n*L)
-vec4 get_diffuse_effects(light &i_light, const sphere& S, const vec4& hit_point, const vec4& normal) {
+vec4 get_diffuse_effects(light &i_light, const vec4& hit_point, const vec4& normal) {
 	
 	vec4 diffuse(0,0,0,0);
-	// for every light source
-	//
-	// compute L
+	
+	// compute L from hitpoint to light
 	vec4 L = i_light.position - hit_point;
-	assert(L.w == 0);
 	L = normalize(L);
-	assert(normal.w == 0);
 
-	// TODO spheres should not use here, have to reconstruct the code
-	// move for loop for every light out of this function
+	// generate diffuse effects if dot(N,L) < 0, angle > 90, ignore current diffuse effect
 	if(dot(normal,L) > 0)
-		diffuse += S.kd * dot(normal,L) * i_light.i_light;
+		// diffuse =  (N*L) * I_light
+		diffuse += dot(normal,L) * i_light.i_light;
 
 	return diffuse;
 }
 
-//#define ISSHADERAYBLOCKED_DEBUG
+// return true if there is object in between of hitpoint and light
 bool isShadeRayBlocked(const vector<sphere> &spheres, const light &L, const vec4 &hit_point, const int sphere_index) {
 	
 	Ray ray;
 	
+	// generate ray from hitpoint to light
 	ray.origin = hit_point;	
 
+	// for every object except the one that hit_point is onto
 	for(int i = 0; i < (int)spheres.size(); i++ ) {
-
+		
 		if(i == sphere_index) 		continue;
-
+		
+		// calculate direction from hitpoint to light, t =1 when point is at position of light
 		ray.dir = L.position - hit_point;
 		
+		// calculate t value, set lower bound of t(near plane) to the value very close to the surface of sphere
 		float t = intersect(spheres[i],ray,0.0001);
 
-#ifdef ISSHADERAYBLOCKED_DEBUG 
-		if(sphere_index == 2 && spheres[i].name == "s2") {
-			cout << "isShadeRayblocked-sphere:" << spheres[i].name << endl;
-			cout << "isShadeRayblocked-ray:" << ray.dir << endl;
-			cout << "isShadeRayblocked-lightsource:" << L.name<< endl;
-			cout << "isShadeRayblocked-lightposition:" << L.position << endl;
-			cout << "isShadeRayblocked-hit_point:" << hit_point << endl;
-			cout << "isShadeRayblocked-t:" << t << endl;
-		}
-
-		if(ray.dir.x == 8.85396){
-			cout << "last " << endl;
-		}
-#endif
-
+		// if t larger than 0 and smaller than 1 the intersect point is in between
 		if(t <= 1 && t >= 0.0001) {
 			return true;
 		}
@@ -399,11 +386,12 @@ bool isShadeRayBlocked(const vector<sphere> &spheres, const light &L, const vec4
 
 }
 
-
+// find t value of intersect point between ray and surface of S
 float intersect(const sphere& S, const Ray &ray, float near_plane) {
+	// S' and C'
 	vec4 S_inverse = S.inverse_matrix * ray.origin;
 	vec4 C_inverse = S.inverse_matrix * ray.dir;
-	assert(C_inverse.w == 0);
+	// set to 0 because it will use to dot with C
 	S_inverse.w = 0;
 
 	// calculate A
@@ -413,64 +401,63 @@ float intersect(const sphere& S, const Ray &ray, float near_plane) {
 	// calculate C
 	float C = pow(length(S_inverse), 2) -1.0;
 
+	// B^2-AC
 	float K = pow(B,2) - A * C;
 		
+	// the ray intersect with a object
 	if(K >= 0) {
 		// one result
 		float t1 = -1 * B / A + sqrt(K) /A;
 		float t2 = -1 * B / A - sqrt(K) /A;
+		// choose smaller t value
+		// ignore t value if it is behind the image plane(t < 1)
 		if(t1 < t2) {
 			if(t1 > near_plane) return t1;
 			else if(t2 > near_plane) return t2;
-			else return 0;
 		}
 		else {
 			if(t2 > near_plane) return t2;
 			else if(t1 > near_plane) return t1;
-			else return 0;
 		}	
 	}
-	else
-	{
-		// ray doesn't touch sphere
-		return 0;
-	}
+	// ray doesn't touch sphere or sphere is behind of image plane
+	return 0;
 }
-// #define GET_T_DEBUG
+
+// calculate t value
 bool get_t(const vector<sphere> &S, const Ray &ray, int& sphere_index, float& t_min) {
-	// for each object
+	
+	// set t_min to infinity
 	t_min = std:: numeric_limits<float>::infinity();
 
 
 	for( int i = 0; i < (int)S.size(); i++ ) {
-#ifdef GET_T_DEBUG
-		if(i == 3 && ray.dir.x == 0 && ray.dir.y == 0) {
-			cout << "get_t dir=" << ray.dir << " " << endl;
-			cout << "get_t t=" << intersect(S[i],ray,g_near) << " " << endl;
-		}
-#endif
+		// temp t value
 		float t = 0;
+		
 		// intersect will return 0 if no intersection or behind the screen
 		if((t = intersect(S[i], ray,g_near)) != 0.0) {
+			// save closest sphere
 			if(t < t_min) {
 				sphere_index = i;
 				t_min = t;
 			}
 		}
 	}
+	// return true if ray intersect with an object
 	return (t_min != std::numeric_limits<float>::infinity());
 }
 
+// calculate dir from origin of ray to image plane(ix,iy)
 vec4 getDir(int ix, int iy)
 {
-    // TODO: modify this. This should return the direction from the origin
-    // to pixel (ix, iy), normalized.
-	
 	double x = g_left + ((float)ix / g_width) * (g_right - g_left);
 	double y = g_bottom + ((float)iy / g_height) * (g_top - g_bottom);
 	
+	// dir is not normalized, because in this way, when t = 1, S+tC is on the image plane
+	// there will be some precision error if normalized
 	vec4 dir = vec4(x,y,-1*g_near,0);
-	//dir = normalize(dir);
+
     return dir;
 }
 
@@ -480,10 +467,6 @@ void renderPixel(int ix, int iy)
     ray.origin = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     ray.dir = getDir(ix, iy);
     vec4 color = trace(ray, 0);
-#ifdef RENDER_DEBUG 
-	if(color.x != background.x && color.y != background.y && color.z != background.z)
-		cout << "color will be renderred=" << color << endl;
-#endif 
 
     setColor(ix, iy, color);
 }
@@ -494,7 +477,6 @@ void render()
         for (int ix = 0; ix < g_width; ix++)
             renderPixel(ix, iy);
 }
-
 
 // -------------------------------------------------------------------
 // PPM saving
@@ -524,7 +506,6 @@ void savePPM(int Width, int Height, char* fname, unsigned char* pixels)
 void saveFile()
 {
     // Convert color components from floats to unsigned chars.
-    // TODO: clamp values if out of range.
     unsigned char* buf = new unsigned char[g_width * g_height * 3];
     for (int y = 0; y < g_height; y++)
         for (int x = 0; x < g_width; x++)
@@ -533,7 +514,6 @@ void saveFile()
                 buf[y*g_width*3+x*3+i] = (unsigned char)(((float*)g_colors[y*g_width+x])[i] * 255.9f);
 			}
     
-    // TODO: change file name based on input file name.
     char* out = (char*) malloc(outputfile.size() + 1);
     memcpy(out, outputfile.c_str(), outputfile.size() +1);
     
